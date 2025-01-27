@@ -75,7 +75,7 @@ export default function Appointment() {
           relationship: formData.relationship,
           visit_type: formData.visitType,
           visitor_count: formData.visitorCount,
-          appointment_date: formData.appointmentDate,
+          appointment_date: new Date(formData.appointmentDate).toISOString(),
         })
         .select()
         .single();
