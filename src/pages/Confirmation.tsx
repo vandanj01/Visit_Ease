@@ -48,7 +48,7 @@ export default function Confirmation() {
   }, [appointmentId]);
 
   const downloadQRCode = useCallback(() => {
-    const canvas = document.querySelector('canvas');
+    const canvas = qrCodeRef.current?.querySelector('canvas');
     if (!canvas) return;
 
     const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
@@ -58,7 +58,7 @@ export default function Confirmation() {
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-  }, [appointmentId]);
+  };
 
 
   if (loading) {
