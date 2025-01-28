@@ -62,6 +62,11 @@ export default function Appointment() {
     e.preventDefault();
     if (!patient) return;
 
+    if (formData.visitorCount > 2) {
+      toast.error('The number of visitors cannot exceed 2.');
+      return; // Prevent form submission
+    }
+
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
