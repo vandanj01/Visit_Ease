@@ -8,6 +8,7 @@ import Confirmation from './pages/Confirmation';
 import Profile from './pages/Profile';
 import PublicAppointment from './pages/PublicAppointment';
 import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
     <BrowserRouter>
@@ -27,4 +28,5 @@ function App() {
     </BrowserRouter>
   );
 }
+
 export default App;
