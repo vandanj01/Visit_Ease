@@ -29,7 +29,7 @@ export default function Appointment() {
           .select('*')
           .eq('id', hospitalId)
           .single();
-        
+
         if (error) throw error;
         setHospital(data);
       } catch (error: any) {
@@ -49,7 +49,7 @@ export default function Appointment() {
         .eq('hospital_id', hospitalId)
         .eq('patient_id', formData.patientId)
         .single();
-      
+
       if (error) throw error;
       setPatient(data);
       toast.success('Patient found');
@@ -75,7 +75,7 @@ export default function Appointment() {
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = new Date(e.target.value);
     setFormData({ ...formData, appointmentDate: e.target.value });
-    
+
     // Generate time slots for the selected date
     const generatedSlots = generateTimeSlots(selectedDate);
     setTimeSlots(generatedSlots);
@@ -149,14 +149,6 @@ export default function Appointment() {
 
           {patient && (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="flex justify-between items-center mb-4">
-        <button
-          onClick={() => navigate('/hospitals')}
-          className="flex items-center text-gray-600 hover:text-gray-900"
-        >
-          Back to Hospitals
-        </button>
-      </div>
               <div className="bg-blue-50 rounded-lg p-4 mb-6">
                 <h3 className="font-medium text-blue-900 mb-2">Patient Details</h3>
                 <p className="text-blue-800">Name: {patient.name}</p>
@@ -229,25 +221,22 @@ export default function Appointment() {
               </div>
 
               <div>
-        <label htmlFor="appointmentDate" className="block text-sm font-medium text-gray-700 mb-1">Appointment Date</label>
+        <label htmlFor="appointmentDate">Appointment Date</label>
         <input
           type="date"
           id="appointmentDate"
           value={formData.appointmentDate}
           onChange={handleDateChange}
           required
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-
              <div>
-        <label htmlFor="timeSlot"  className="block text-sm font-medium text-gray-700 mb-1">Select Time Slot</label>
+        <label htmlFor="timeSlot">Select Time Slot</label>
         <select
           id="timeSlot"
           value={formData.selectedTimeSlot}
           onChange={(e) => setFormData({ ...formData, selectedTimeSlot: e.target.value })}
           required
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">-- Select a Time Slot --</option>
           {timeSlots.map((slot, index) => (
@@ -257,7 +246,7 @@ export default function Appointment() {
           ))}
         </select>
       </div>
-              
+
 
               <button
                 type="submit"
