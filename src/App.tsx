@@ -16,13 +16,13 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Routes>
           <Route path="/" element={<Auth />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/appointment/view/:appointmentId" element={<PublicAppointment />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/hospitals" element={<Hospitals />} />
             <Route path="/appointment/:hospitalId" element={<Appointment />} />
             <Route path="/confirmation/:appointmentId" element={<Confirmation />} />
             <Route path="/profile" element={<Profile />} />
-             <Route path="/admin" element={<AdminDashboard />} />
           </Route>
         </Routes>
         <Toaster position="top-center" />
