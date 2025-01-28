@@ -151,7 +151,7 @@ export default function Confirmation() {
                 <div className="flex items-center">
                   <Calendar className="h-5 w-5 text-gray-400 mr-2" />
                   <span className="text-gray-600">
-                    {formattedDate}
+                    {formattedDateTime}
                   </span>
                 </div>
 
