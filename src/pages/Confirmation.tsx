@@ -76,7 +76,14 @@ export default function Confirmation() {
       </div>
     );
   }
-  const formattedDate = format(new Date(appointment.appointment_date), 'PPpp');
+  const formattedDateTime = new Date(appointment.appointment_date).toLocaleString([], {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
 
   const publicAppointmentUrl = `${window.location.origin}/appointment/view/${appointmentId}`;
 
