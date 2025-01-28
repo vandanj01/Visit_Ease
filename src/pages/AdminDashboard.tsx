@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState([]);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -58,7 +56,6 @@ export default function AdminDashboard() {
             <th className="border px-4 py-2">Patient Name</th>
             <th className="border px-4 py-2">Appointment Date</th>
             <th className="border px-4 py-2">Visit Type</th>
-            <th className="border px-4 py-2">Status</th>
             <th className="border px-4 py-2">Actions</th>
           </tr>
         </thead>
@@ -68,7 +65,6 @@ export default function AdminDashboard() {
               <td className="border px-4 py-2">{appointment.patients.name}</td>
               <td className="border px-4 py-2">{new Date(appointment.appointment_date).toLocaleString()}</td>
               <td className="border px-4 py-2">{appointment.visit_type}</td>
-              <td className="border px-4 py-2">{appointment.status}</td>
               <td className="border px-4 py-2">
                 <button onClick={() => handleApproval(appointment.id)} className="text-green-600">Approve</button>
                 <button onClick={() => handleRejection(appointment.id)} className="text-red-600 ml-2">Reject</button>
