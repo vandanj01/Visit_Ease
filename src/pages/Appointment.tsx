@@ -149,6 +149,14 @@ export default function Appointment() {
 
           {patient && (
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={() => navigate('/hospitals')}
+          className="flex items-center text-gray-600 hover:text-gray-900"
+        >
+          Back to Hospitals
+        </button>
+      </div>
               <div className="bg-blue-50 rounded-lg p-4 mb-6">
                 <h3 className="font-medium text-blue-900 mb-2">Patient Details</h3>
                 <p className="text-blue-800">Name: {patient.name}</p>
