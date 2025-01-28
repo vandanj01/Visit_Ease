@@ -1,155 +1,212 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { QRCodeSVG } from 'qrcode.react';
-import { format } from 'date-fns';
-import { CheckCircle2, Calendar, Users, VideoIcon, UserRound, Loader2, ArrowLeft, Download } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Mail, Upload, Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { supabase } from '../lib/supabase';
-import type { Appointment, Patient, Hospital } from '../types';
-interface AppointmentDetails extends Appointment {
-  patients: Patient;
-  patients: {
-    hospitals: Hospital;
-  };
-}
-export default function Confirmation() {
-  const { appointmentId } = useParams();
+
+const ID_TYPES = [
+  'National ID',
+  'Passport',
+  'Driver\'s License',
+  'Military ID'
+];
+
+export default function Auth() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [appointment, setAppointment] = useState<AppointmentDetails | null>(null);
-  useEffect(() => {
-    const fetchAppointment = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('appointments')
-          .select(`
-            *,
-            patients (
-              *,
-              hospitals (*)
-            )
-          `)
-          .eq('id', appointmentId)
-          .single();
-        if (error) throw error;
-        setAppointment(data);
-      } catch (error: any) {
-        console.error('Error fetching appointment:', error.message);
-      } finally {
-        setLoading(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    fullName: '',
+    idType: ID_TYPES[0],
+    idDocument: null as File | null,
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (isSignUp) {
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+        });
+        if (signUpError) throw signUpError;
+        if (!signUpData.user) throw new Error('No user returned from sign up');
+
+        const idDocumentPath = formData.idDocument 
+          ? `id-documents/${Date.now()}-${formData.idDocument.name}`
+          : null;
+
+        if (idDocumentPath && formData.idDocument) {
+          const { error: uploadError } = await supabase.storage
+            .from('documents')
+            .upload(idDocumentPath, formData.idDocument);
+          if (uploadError) throw uploadError;
+        }
+
+        // Create user profile in the users table
+        const { error: profileError } = await supabase
+          .from('users')
+          .insert({
+            id: signUpData.user.id, // Use the auth user id
+            email: formData.email,
+            full_name: formData.fullName,
+            id_type: formData.idType,
+            id_document_url: idDocumentPath,
+          });
+        if (profileError) throw profileError;
+
+        toast.success('Account created successfully!');
+      } else {
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+        if (signInError) throw signInError;
+        
+        toast.success('Signed in successfully!');
       }
-    };
-    fetchAppointment();
-  }, [appointmentId]);
-  const downloadQRCode = useCallback(() => {
-    const canvas = document.querySelector('canvas');
-    if (!canvas) return;
-    const link = document.createElement('a');
-    link.download = `appointment-${appointmentId}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }, [appointmentId]);
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
-      </div>
-    );
-  }
-  if (!appointment) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Appointment not found</p>
-      </div>
-    );
-  }
-  const publicAppointmentUrl = `${window.location.origin}/appointment/view/${appointmentId}`;
+
+      navigate('/hospitals');
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
-          <button
-            onClick={() => navigate('/hospitals')}
-            className="flex items-center text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-5 w-5 mr-1" />
-            Back to Hospitals
-          </button>
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
-          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Appointment Confirmed!
+            Hospital Visit Scheduler
           </h1>
           <p className="text-gray-600">
-            Your visit has been scheduled successfully
+            {isSignUp ? 'Create an account to continue' : 'Sign in to your account'}
           </p>
         </div>
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="p-6">
-            <div className="flex flex-col items-center mb-6">
-              <QRCodeSVG
-                value={publicAppointmentUrl}
-                size={160}
-                level="H"
-                includeMargin
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                className="pl-10 w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="you@example.com"
               />
-              <button
-                onClick={downloadQRCode}
-                className="mt-4 flex items-center text-blue-600 hover:text-blue-700"
-              >
-                <Download className="h-5 w-5 mr-1" />
-                Download QR Code
-              </button>
-              <p className="mt-2 text-sm text-gray-500 text-center">
-                Anyone can scan this QR code to view the appointment details
-              </p>
-            </div>
-            <div className="space-y-4">
-              <div className="border-b pb-4">
-                <h3 className="font-medium text-gray-900 mb-2">Hospital Details</h3>
-                <p className="text-gray-600">{appointment.patients.hospitals.name}</p>
-                <p className="text-gray-600">{appointment.patients.hospitals.address}</p>
-              </div>
-              <div className="border-b pb-4">
-                <h3 className="font-medium text-gray-900 mb-2">Patient Details</h3>
-                <p className="text-gray-600">Name: {appointment.patients.name}</p>
-                <p className="text-gray-600">Room: {appointment.patients.room_number}</p>
-                <p className="text-gray-600">Ward: {appointment.patients.ward}</p>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <Calendar className="h-5 w-5 text-gray-400 mr-2" />
-                  <span className="text-gray-600">
-                    {format(new Date(appointment.appointment_date), 'PPpp')}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  {appointment.visit_type === 'in-person' ? (
-                    <UserRound className="h-5 w-5 text-gray-400 mr-2" />
-                  ) : (
-                    <VideoIcon className="h-5 w-5 text-gray-400 mr-2" />
-                  )}
-                  <span className="text-gray-600">
-                    {appointment.visit_type === 'in-person' ? 'In-person Visit' : 'Online Visit'}
-                  </span>
-                </div>
-                <div className="flex items-center">
-                  <Users className="h-5 w-5 text-gray-400 mr-2" />
-                  <span className="text-gray-600">
-                    {appointment.visitor_count} {appointment.visitor_count === 1 ? 'Visitor' : 'Visitors'}
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
-          <div className="bg-gray-50 px-6 py-4">
-            <p className="text-sm text-gray-500 text-center">
-              Please show this QR code to the hospital staff upon arrival
-            </p>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="••••••••"
+              minLength={6}
+            />
           </div>
-        </div>
+
+          {isSignUp && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ID Type
+                </label>
+                <select
+                  value={formData.idType}
+                  onChange={(e) => setFormData({ ...formData, idType: e.target.value })}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {ID_TYPES.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ID Document
+                </label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    required
+                    accept="image/*,.pdf"
+                    onChange={(e) => setFormData({ 
+                      ...formData, 
+                      idDocument: e.target.files?.[0] || null 
+                    })}
+                    className="hidden"
+                    id="id-document"
+                  />
+                  <label
+                    htmlFor="id-document"
+                    className="flex items-center justify-center w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-4 cursor-pointer hover:border-blue-500 transition-colors"
+                  >
+                    <Upload className="h-6 w-6 text-gray-400 mr-2" />
+                    <span className="text-gray-600">
+                      {formData.idDocument ? formData.idDocument.name : 'Upload ID Document'}
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <Loader2 className="animate-spin h-5 w-5 mx-auto" />
+            ) : (
+              isSignUp ? 'Create Account' : 'Sign In'
+            )}
+          </button>
+
+          <p className="text-center text-sm text-gray-600">
+            {isSignUp ? 'Already have an account?' : 'Don\'t have an account?'}
+            <button
+              type="button"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
+            >
+              {isSignUp ? 'Sign In' : 'Sign Up'}
+            </button>
+          </p>
+        </form>
       </div>
     </div>
   );
