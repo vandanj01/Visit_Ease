@@ -95,7 +95,7 @@ export default function Confirmation() {
             Appointment Request Processed!
           </h1>
           <p className="text-gray-600">
-            Your visit request has been processed successfully
+            Your visit request has been processed successfully! Wait for confirmation email to confirm your appointment!
           </p>
         </div>
 
