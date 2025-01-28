@@ -22,13 +22,16 @@ export default function Auth() {
     idType: ID_TYPES[0],
     idDocument: null as File | null,
   });
-  const [adminPassword, setAdminPassword] = useState(''); // State for admin password
-  const handleAdminAccess = async () => {
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [isAdminAccessVisible, setIsAdminAccessVisible] = useState(false);
+
+ const handleAdminAccess = async () => {
       // Fetch the hospital-specific admin password from Supabase
       const { data, error } = await supabase
           .from('hospitals') // Assuming you have a hospitals table
           .select('admin_password')
-          .eq('id', 'your_hospital_id') // Replace with actual hospital ID logic
+          .eq('email', adminEmail) // Assuming you are using email for identification
           .single();
 
       if (error) {
@@ -41,9 +44,13 @@ export default function Auth() {
       if (adminPassword === data.admin_password) {
           navigate('/admin-dashboard'); // Redirect to admin dashboard
       } else {
-          toast.error('Invalid admin password');
+          toast.error('Invalid admin credentials');
       }
-  };
+      
+      // Close modal after processing
+      setIsAdminAccessVisible(false);
+  }
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -109,7 +116,14 @@ export default function Auth() {
             {isSignUp ? 'Create an account to continue' : 'Sign in to your account'}
           </p>
         </div>
-
+        <button 
+            onClick={() => setIsAdminAccessVisible(!isAdminAccessVisible)} 
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Admin Access
+          </button>
+        </div>
+        
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -249,6 +263,38 @@ export default function Auth() {
             </button>
           </p>
         </form>
+      {isAdminAccessVisible && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
+            <input 
+              type="email" 
+              value={adminEmail} 
+              onChange={(e) => setAdminEmail(e.target.value)} 
+              placeholder="admin@example.com" 
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-2" 
+            />
+            
+            <label className="block text-sm font-medium text-gray-700 mb -1">Admin Password</label>
+            <input 
+              type="password" 
+              value={adminPassword} 
+              onChange={(e) => setAdminPassword(e.target.value)} 
+              placeholder="Enter Admin Password" 
+              className="w-full border border-gray -300 rounded-lg px -4 py -2 mb -4" 
+            />
+
+            <button 
+              onClick={handleAdminAccess} 
+              className="w-full bg-blue -600 text-white rounded-lg px -4 py -2 hover:bg-blue -700"
+            >
+              Access Admin Dashboard
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
       </div>
     </div>
   );
