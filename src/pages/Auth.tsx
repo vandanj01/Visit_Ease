@@ -22,16 +22,17 @@ export default function Auth() {
     idType: ID_TYPES[0],
     idDocument: null as File | null,
   });
+
+  // Admin access state
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [isAdminAccessVisible, setIsAdminAccessVisible] = useState(false);
 
- const handleAdminAccess = async () => {
-      // Fetch the hospital-specific admin password from Supabase
+  const handleAdminAccess = async () => {
       const { data, error } = await supabase
-          .from('hospitals') // Assuming you have a hospitals table
+          .from('hospitals')
           .select('admin_password')
-          .eq('email', adminEmail) // Assuming you are using email for identification
+          .eq('email', adminEmail)
           .single();
 
       if (error) {
@@ -40,17 +41,15 @@ export default function Auth() {
           return;
       }
 
-      // Validate admin password
       if (adminPassword === data.admin_password) {
-          navigate('/admin-dashboard'); // Redirect to admin dashboard
+          navigate('/admin-dashboard');
       } else {
           toast.error('Invalid admin credentials');
       }
       
-      // Close modal after processing
       setIsAdminAccessVisible(false);
-  }
-  
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -74,11 +73,10 @@ export default function Auth() {
           if (uploadError) throw uploadError;
         }
 
-        // Create user profile in the users table
         const { error: profileError } = await supabase
           .from('users')
           .insert({
-            id: signUpData.user.id, // Use the auth user id
+            id: signUpData.user.id,
             email: formData.email,
             full_name: formData.fullName,
             id_type: formData.idType,
@@ -108,191 +106,192 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
       <div className="bg-white rounded-xl shadow-xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Hospital Visit Scheduler
-          </h1>
-          <p className="text-gray-600">
-            {isSignUp ? 'Create an account to continue' : 'Sign in to your account'}
-          </p>
-        </div>
-        <button 
-            onClick={() => setIsAdminAccessVisible(!isAdminAccessVisible)} 
+        <div className="flex justify-between mb-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Hospital Visit Scheduler
+            </h1>
+            <p className="text-gray-600">
+              {isSignUp ? 'Create an account to continue' : 'Sign in to your account'}
+            </p>
+          </div>
+          {/* Admin Access Button */}
+          <button 
+            onClick={() => setIsAdminAccessVisible(true)} 
             className="text-blue-600 hover:text-blue-700 font-medium"
           >
             Admin Access
           </button>
         </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="pl-10 w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="you@example.com"
-              />
-            </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
-              minLength={6}
-            />
-          </div>
-
-             <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Admin Password
-            </label>
-            <input
-              type="password"
-              value={adminPassword}
-              onChange={(e) => setAdminPassword(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter Admin Password (only for admins)"
-            />
-            <button 
-              type="button" 
-              onClick={handleAdminAccess} 
-              className="mt-2 w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Access Admin Dashboard
-            </button>
-          </div>
-
-
-          {isSignUp && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Full Name
-                </label>
+        {/* Conditional Rendering */}
+        {!isAdminAccessVisible ? (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <input
-                  type="text"
+                  type="email"
                   required
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="pl-10 w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="you@example.com"
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ID Type
-                </label>
-                <select
-                  value={formData.idType}
-                  onChange={(e) => setFormData({ ...formData, idType: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  {ID_TYPES.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            {/* Password Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="••••••••"
+                minLength={6}
+              />
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ID Document
-                </label>
-                <div className="relative">
+            {/* Additional Sign-Up Fields */}
+            {isSignUp && (
+              <>
+                {/* Full Name Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
                   <input
-                    type="file"
+                    type="text"
                     required
-                    accept="image/*,.pdf"
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      idDocument: e.target.files?.[0] || null 
-                    })}
-                    className="hidden"
-                    id="id-document"
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <label
-                    htmlFor="id-document"
-                    className="flex items-center justify-center w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-4 cursor-pointer hover:border-blue-500 transition-colors"
-                  >
-                    <Upload className="h-6 w-6 text-gray-400 mr-2" />
-                    <span className="text-gray-600">
-                      {formData.idDocument ? formData.idDocument.name : 'Upload ID Document'}
-                    </span>
-                  </label>
                 </div>
-              </div>
-            </>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? (
-              <Loader2 className="animate-spin h-5 w-5 mx-auto" />
-            ) : (
-              isSignUp ? 'Create Account' : 'Sign In'
+                {/* ID Type Select */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ID Type</label>
+                  <select
+                    value={formData.idType}
+                    onChange={(e) => setFormData({ ...formData, idType: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {ID_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* ID Document Upload */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ID Document</label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      required
+                      accept="image/*,.pdf"
+                      onChange={(e) => setFormData({ 
+                        ...formData, 
+                        idDocument: e.target.files?.[0] || null 
+                      })}
+                      className="hidden"
+                      id="id-document"
+                    />
+                    <label
+                      htmlFor="id-document"
+                      className="flex items-center justify-center w-full rounded-lg border-2 border-dashed border-gray-300 px-4 py-4 cursor-pointer hover:border-blue-500 transition-colors"
+                    >
+                      <Upload className="h-6 w-6 text-gray-400 mr-2" />
+                      <span className="text-gray-600">
+                        {formData.idDocument ? formData.idDocument.name : 'Upload ID Document'}
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </>
             )}
-          </button>
 
-          <p className="text-center text-sm text-gray-600">
-            {isSignUp ? 'Already have an account?' : 'Don\'t have an account?'}
+            {/* Submit Button */}
             <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
+              type="submit"
+              disabled={loading}
+              className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {isSignUp ? 'Sign In' : 'Sign Up'}
+              {loading ? (
+                <Loader2 className="animate-spin h-5 w-5 mx-auto" />
+              ) : (
+                isSignUp ? 'Create Account' : 'Sign In'
+              )}
             </button>
-          </p>
-        </form>
-      {isAdminAccessVisible && (
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
-            <input 
-              type="email" 
-              value={adminEmail} 
-              onChange={(e) => setAdminEmail(e.target.value)} 
-              placeholder="admin@example.com" 
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 mb-2" 
-            />
-            
-            <label className="block text-sm font-medium text-gray-700 mb -1">Admin Password</label>
-            <input 
-              type="password" 
-              value={adminPassword} 
-              onChange={(e) => setAdminPassword(e.target.value)} 
-              placeholder="Enter Admin Password" 
-              className="w-full border border-gray -300 rounded-lg px -4 py -2 mb -4" 
-            />
 
+            {/* Toggle Sign Up / Sign In */}
+            <p className="text-center text-sm text-gray-600">
+              {isSignUp ? 'Already have an account?' : 'Don\'t have an account?'}
+              <button
+                type="button"
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="ml-1 text-blue-600 hover:text-blue-700 font-medium"
+              >
+                {isSignUp ? 'Sign In' : 'Sign Up'}
+              </button>
+            </p>
+          </form>
+        ) : (
+          // Admin Access Form
+          <form onSubmit={(e) => { e.preventDefault(); handleAdminAccess(); }} className="space-y-6">
+            <h2 className="text-xl font-bold mb-4">Admin Login</h2>
+
+            {/* Admin Email Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb -1">Admin Email</label>
+              <input 
+                type="email" 
+                value={adminEmail} 
+                onChange={(e) => setAdminEmail(e.target.value)} 
+                placeholder="admin@example.com" 
+                className="w-full border border-gray -300 rounded-lg px -4 py -2 mb -2" 
+                required
+              />
+            </div>
+
+            {/* Admin Password Input */}
+            <div>
+              <label className="block text-sm font-medium text-gray -700 mb -1">Admin Password</label>
+              <input 
+                type="password" 
+                value={adminPassword} 
+                onChange={(e) => setAdminPassword(e.target.value)} 
+                placeholder="Enter Admin Password" 
+                className="w-full border border-gray -300 rounded-lg px -4 py -2 mb -4" 
+                required
+              />
+            </div>
+
+            {/* Access Admin Dashboard Button */}
             <button 
-              onClick={handleAdminAccess} 
+              type="submit"
               className="w-full bg-blue -600 text-white rounded-lg px -4 py -2 hover:bg-blue -700"
             >
               Access Admin Dashboard
             </button>
-          </div>
+
+            {/* Button to go back to Sign In/Sign Up */}
+            <button 
+              type="button"
+              onClick={() => setIsAdminAccessVisible(false)} 
+              className="mt -2 w-full text-red -600 hover:text-red -700"
+            >
+              Cancel
+            </button>
+          </form>
         )}
       </div>
     </div>
   );
 }
-      
