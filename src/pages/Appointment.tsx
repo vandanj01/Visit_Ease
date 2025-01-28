@@ -221,6 +221,17 @@ export default function Appointment() {
               </div>
 
               <div>
+        <label htmlFor="appointmentDate">Appointment Date</label>
+        <input
+          type="date"
+          id="appointmentDate"
+          value={formData.appointmentDate}
+          onChange={handleDateChange}
+          required
+        />
+      </div>
+
+             <div>
         <label htmlFor="timeSlot">Select Time Slot</label>
         <select
           id="timeSlot"
