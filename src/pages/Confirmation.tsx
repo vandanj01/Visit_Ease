@@ -76,6 +76,7 @@ export default function Confirmation() {
       </div>
     );
   }
+  const formattedDate = format(new Date(appointment.appointment_date), 'PPpp');
 
   const publicAppointmentUrl = `${window.location.origin}/appointment/view/${appointmentId}`;
 
@@ -143,7 +144,7 @@ export default function Confirmation() {
                 <div className="flex items-center">
                   <Calendar className="h-5 w-5 text-gray-400 mr-2" />
                   <span className="text-gray-600">
-                    {format(new Date(appointment.appointment_date), 'PPpp')}
+                    {formattedDate}
                   </span>
                 </div>
 
