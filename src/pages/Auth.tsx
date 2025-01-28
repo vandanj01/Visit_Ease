@@ -22,7 +22,28 @@ export default function Auth() {
     idType: ID_TYPES[0],
     idDocument: null as File | null,
   });
+  const [adminPassword, setAdminPassword] = useState(''); // State for admin password
+  const handleAdminAccess = async () => {
+      // Fetch the hospital-specific admin password from Supabase
+      const { data, error } = await supabase
+          .from('hospitals') // Assuming you have a hospitals table
+          .select('admin_password')
+          .eq('id', 'your_hospital_id') // Replace with actual hospital ID logic
+          .single();
 
+      if (error) {
+          console.error('Error fetching admin password:', error.message);
+          toast.error('Error accessing admin panel.');
+          return;
+      }
+
+      // Validate admin password
+      if (adminPassword === data.admin_password) {
+          navigate('/admin-dashboard'); // Redirect to admin dashboard
+      } else {
+          toast.error('Invalid admin password');
+      }
+  };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -121,6 +142,7 @@ export default function Auth() {
               minLength={6}
             />
           </div>
+          
 
           {isSignUp && (
             <>
@@ -183,6 +205,26 @@ export default function Auth() {
               </div>
             </>
           )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Admin Password
+            </label>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter Admin Password"
+            />
+            <button 
+              type="button" 
+              onClick={handleAdminAccess} 
+              className="mt-2 w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Access Admin Dashboard
+            </button>
+          </div>
 
           <button
             type="submit"
