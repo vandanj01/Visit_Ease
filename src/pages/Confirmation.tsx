@@ -18,6 +18,7 @@ export default function Confirmation() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [appointment, setAppointment] = useState<AppointmentDetails | null>(null);
+  const qrCodeRef = React.useRef<HTMLDivElement>(null); // Reference for the QR code
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -50,11 +51,15 @@ export default function Confirmation() {
     const canvas = document.querySelector('canvas');
     if (!canvas) return;
 
-    const link = document.createElement('a');
-    link.download = `appointment-${appointmentId}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    const downloadLink = document.createElement("a");
+    downloadLink.href = pngUrl;
+    downloadLink.download = `appointment-${appointmentId}.png`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   }, [appointmentId]);
+
 
   if (loading) {
     return (
