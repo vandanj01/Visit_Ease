@@ -8,6 +8,7 @@ import Confirmation from './pages/Confirmation';
 import Profile from './pages/Profile';
 import PublicAppointment from './pages/PublicAppointment';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/appointment/:hospitalId" element={<Appointment />} />
             <Route path="/confirmation/:appointmentId" element={<Confirmation />} />
             <Route path="/profile" element={<Profile />} />
+             <Route path="/admin" element={<AdminDashboard />} />
           </Route>
         </Routes>
         <Toaster position="top-center" />
