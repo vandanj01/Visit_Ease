@@ -245,47 +245,51 @@ export default function Auth() {
         ) : (
           // Admin Access Form
           <form onSubmit={(e) => { e.preventDefault(); handleAdminAccess(); }} className="space-y-6">
-            <h2 className="text-xl font-bold mb-4">Admin Login</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Admin Login</h2>
+            <p className="text-gray-600 mb-6">Enter your admin credentials to access the dashboard</p>
 
             {/* Admin Email Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb -1">Admin Email</label>
-              <input 
-                type="email" 
-                value={adminEmail} 
-                onChange={(e) => setAdminEmail(e.target.value)} 
-                placeholder="admin@example.com" 
-                className="w-full border border-gray -300 rounded-lg px -4 py -2 mb -2" 
-                required
-              />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="email"
+                  required
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="pl-10 w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="admin@example.com"
+                />
+              </div>
             </div>
 
             {/* Admin Password Input */}
             <div>
-              <label className="block text-sm font-medium text-gray -700 mb -1">Admin Password</label>
-              <input 
-                type="password" 
-                value={adminPassword} 
-                onChange={(e) => setAdminPassword(e.target.value)} 
-                placeholder="Enter Admin Password" 
-                className="w-full border border-gray -300 rounded-lg px -4 py -2 mb -4" 
+              <label className="block text-sm font-medium text-gray-700 mb-1">Admin Password</label>
+              <input
+                type="password"
                 required
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="••••••••"
               />
             </div>
 
             {/* Access Admin Dashboard Button */}
-            <button 
+            <button
               type="submit"
-              className="w-full bg-blue -600 text-white rounded-lg px -4 py -2 hover:bg-blue -700"
+              className="w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               Access Admin Dashboard
             </button>
 
             {/* Button to go back to Sign In/Sign Up */}
-            <button 
+            <button
               type="button"
-              onClick={() => setIsAdminAccessVisible(false)} 
-              className="mt -2 w-full text-red -600 hover:text-red -700"
+              onClick={() => setIsAdminAccessVisible(false)}
+              className="w-full text-center text-blue-600 hover:text-blue-700 font-medium mt-2"
             >
               Cancel
             </button>
