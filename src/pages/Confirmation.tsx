@@ -89,13 +89,13 @@ export default function Confirmation() {
 
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
+            <CheckCircle2 className="h-8 w-8 text-yellow-600" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Appointment Confirmed!
+            Appointment Request Confirmed!
           </h1>
           <p className="text-gray-600">
-            Your visit has been scheduled successfully
+            Your visit request has been processed successfully
           </p>
         </div>
 
