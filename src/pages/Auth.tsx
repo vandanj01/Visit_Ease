@@ -206,6 +206,10 @@ export default function Auth() {
               {isSignUp ? 'Sign In' : 'Sign Up'}
             </button>
           </p>
+          <button onClick={() => navigate('/admin')} className="absolute bottom-4 right-4 text-blue-600 hover:text-blue-700">
+  Admin Dashboard
+</button>
+
         </form>
       </div>
     </div>
