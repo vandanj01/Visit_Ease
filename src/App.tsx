@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Auth from './pages/Auth';
+import AdminDashboard from './components/AdminDashboard';
 import Hospitals from './pages/Hospitals';
 import Appointment from './pages/Appointment';
 import Confirmation from './pages/Confirmation';
@@ -15,6 +16,7 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Routes>
           <Route path="/" element={<Auth />} />
+                <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/appointment/view/:appointmentId" element={<PublicAppointment />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/hospitals" element={<Hospitals />} />
