@@ -8,7 +8,6 @@ import Confirmation from './pages/Confirmation';
 import Profile from './pages/Profile';
 import PublicAppointment from './pages/PublicAppointment';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -16,7 +15,6 @@ function App() {
       <div className="min-h-screen bg-gray-50">
         <Routes>
           <Route path="/" element={<Auth />} />
-          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/appointment/view/:appointmentId" element={<PublicAppointment />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/hospitals" element={<Hospitals />} />
