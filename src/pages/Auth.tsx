@@ -142,7 +142,27 @@ export default function Auth() {
               minLength={6}
             />
           </div>
-          
+
+             <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Admin Password
+            </label>
+            <input
+              type="password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter Admin Password (only for admins)"
+            />
+            <button 
+              type="button" 
+              onClick={handleAdminAccess} 
+              className="mt-2 w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Access Admin Dashboard
+            </button>
+          </div>
+
 
           {isSignUp && (
             <>
@@ -205,26 +225,6 @@ export default function Auth() {
               </div>
             </>
           )}
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Admin Password
-            </label>
-            <input
-              type="password"
-              value={adminPassword}
-              onChange={(e) => setAdminPassword(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter Admin Password (only for admins)"
-            />
-            <button 
-              type="button" 
-              onClick={handleAdminAccess} 
-              className="mt-2 w-full bg-blue-600 text-white rounded-lg px-4 py-2 font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              Access Admin Dashboard
-            </button>
-          </div>
 
           <button
             type="submit"
